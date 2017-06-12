@@ -66,18 +66,30 @@ public class CheeseController {
         return "redirect:";
     }
 
-    @RequestMapping(value = "edit/{cheeseId}", method = RequestMethod.GET)
+    @RequestMapping(value = "edit/{cheeseId}")
     public String displayEditForm(Model model, @PathVariable int cheeseId) {
-        Cheese c = CheeseData.getById(cheeseId);
-        model.addAttribute("cheese", c);
+        Cheese cheese = CheeseData.getById(cheeseId);
+        model.addAttribute("title", "Edit Cheese " + cheese.getName());
+        model.addAttribute("cheeseTypes", CheeseType.values());
+        model.addAttribute(cheese);
         return "cheese/edit";
     }
 
     @RequestMapping(value = "edit", method = RequestMethod.POST)
-    public String processEditForm(int cheeseId, String name, String description) {
-        Cheese c = CheeseData.getById(cheeseId);
-        c.setName(name);
-        c.setDescription(description);
+    public String processEditForm(@ModelAttribute  @Valid Cheese newCheese, Errors errors, Model model) {
+        if (errors.hasErrors()) {
+            model.addAttribute("title", "Edit Cheese " + newCheese.getName());
+            //Cheese cheese = CheeseData.getById(cheeseId);
+            model.addAttribute("cheese", newCheese);
+            model.addAttribute("cheeseTypes", CheeseType.values());
+
+            return "cheese/edit";
+        }
+
+        Cheese c = CheeseData.getById(newCheese.getCheeseId());
+        c.setName(newCheese.getName());
+        c.setDescription(newCheese.getDescription());
+        c.setType(newCheese.getType());
         return "redirect:";
     }
 
